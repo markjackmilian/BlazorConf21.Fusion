@@ -38,13 +38,11 @@ namespace Fusion.WebApp
             
             var fusion = services.AddFusion();
             var fusionClient = fusion.AddRestEaseClient(
-                (c, o) =>
-                {
+                (c, o) => {
                     o.BaseUri = baseUri;
                     o.MessageLogLevel = LogLevel.Information;
                 }).ConfigureHttpClientFactory(
-                (c, name, o) =>
-                {
+                (c, name, o) => {
                     var isFusionClient = (name ?? "").StartsWith("Stl.Fusion");
                     var clientBaseUri = isFusionClient ? baseUri : apiBaseUri;
                     o.HttpClientActions.Add(client => client.BaseAddress = clientBaseUri);
