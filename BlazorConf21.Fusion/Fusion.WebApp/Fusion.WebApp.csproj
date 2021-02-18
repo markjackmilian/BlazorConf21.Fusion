@@ -5,10 +5,16 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="LiveSharp" Version="1.6.52" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.3" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.3" PrivateAssets="all" />
-        <PackageReference Include="Stl.Fusion.Blazor" Version="0.9.106" />
+        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.3" />
+        <PackageReference Include="Stl.Fusion.Blazor" Version="0.10.11" />
         <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Fusion.Shared\Fusion.Shared.csproj" />
     </ItemGroup>
 
 </Project>

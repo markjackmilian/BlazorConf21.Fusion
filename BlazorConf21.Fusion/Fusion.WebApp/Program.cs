@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Text;
+using Fusion.Shared;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Stl.DependencyInjection;
 using Stl.Fusion;
@@ -27,14 +29,25 @@ namespace Fusion.WebApp
 
             builder.Services.AddScoped(
                 sp => new HttpClient {BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)});
+            
+            var host = builder.Build();
+            var runTask = host.RunAsync();
+            
+            // Blazor host doesn't start IHostedService-s by default,
+            // so let's start them "manually" here
+            Task.Run(async () => {
+                var hostedServices = host.Services.GetService<IEnumerable<IHostedService>>();
+                foreach (var hostedService in hostedServices)
+                    await hostedService.StartAsync(default);
+            });
 
-            await builder.Build().RunAsync();
+            await runTask;
         }
 
         private static void ConfigureServices(IServiceCollection services, WebAssemblyHostBuilder builder)
         {
             var baseUri = new Uri(builder.HostEnvironment.BaseAddress);
-            var apiBaseUri = new Uri($"{baseUri}api/");
+            var apiBaseUri = new Uri("https://localhost:5001");
             
             var fusion = services.AddFusion();
             var fusionClient = fusion.AddRestEaseClient(
@@ -49,6 +62,12 @@ namespace Fusion.WebApp
                 });
             
             services.UseAttributeScanner(ClientSideScope).AddServicesFrom(Assembly.GetExecutingAssembly());
+            services.UseAttributeScanner(ClientSideScope).AddServicesFrom(typeof(ISumService).Assembly);
+
+            services.AddSingleton(c => new UpdateDelayer.Options() {
+                // Default update delayer options 
+                Delay = TimeSpan.FromSeconds(0.1),
+            });
             
             ConfigureSharedServices(services);
         }

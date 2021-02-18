@@ -6,7 +6,8 @@
 
     <ItemGroup>
         <PackageReference Include="mjm.nethelpers" Version="1.2.0" />
-        <PackageReference Include="Stl.Fusion.Server" Version="0.9.106" />
+        <PackageReference Include="Stl.Fusion.Blazor" Version="0.10.11" />
+        <PackageReference Include="Stl.Fusion.Server" Version="0.10.11" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
     </ItemGroup>
 

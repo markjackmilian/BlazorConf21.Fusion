@@ -6,6 +6,8 @@ using Stl.Fusion.Server;
 
 namespace Fusion.Api.Controllers
 {
+    [ApiController]
+    [Route("[controller]")]
     public class SumController : Controller
     {
         private readonly ISumService _sumService;
@@ -16,15 +18,16 @@ namespace Fusion.Api.Controllers
         // - Publication is created
         // - Its Id is shared in response header.
         [Publish]
+        [HttpGet("getvalue")]
         public Task<int> Get()
         {
             return this._sumService.GetValue();
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public Task Sum()
         {
-            return this._sumService.Add(1);
+            return this._sumService.AddOne();
         }
     }
 }

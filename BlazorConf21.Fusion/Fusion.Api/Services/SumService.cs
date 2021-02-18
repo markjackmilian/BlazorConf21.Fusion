@@ -7,21 +7,24 @@ using Stl.Fusion;
 
 namespace Fusion.Api.Services
 {
-    [ComputeService]
+    [ComputeService(typeof(ISumService))]
     public class SumService : ISumService
     {
-        private readonly ThreadSafe<int> _count = ThreadSafe.On(0);
+        private static int _count;
 
-        public Task<int> GetValue(CancellationToken cancellationToken = default)
+        public virtual async Task<int> GetValue()
         {
-            return Task.FromResult(this._count.Use(i => i));
+            await Task.Delay(1000);
+            return _count;
         }
 
-        public Task Add(int value, CancellationToken cancellationToken = default)
+        public Task AddOne()
         {
-            this._count.Use(i => ++i);
-            using var context = Computed.Invalidate();
-            this.GetValue(cancellationToken).Ignore();
+            _count += 1;
+            using (Computed.Invalidate())
+            {
+                this.GetValue().Ignore();
+            }
 
             return Task.CompletedTask;
         }
