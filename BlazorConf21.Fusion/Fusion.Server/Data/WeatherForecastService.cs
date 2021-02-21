@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Fusion.ServerSide.Data
+namespace Fusion.Server.Data
 {
     public class WeatherForecastService
     {

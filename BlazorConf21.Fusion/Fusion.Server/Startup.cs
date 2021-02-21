@@ -10,12 +10,14 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Fusion.ServerSide.Data;
-using Fusion.ServerSide.Services;
+using Fusion.Server.Data;
 using Stl.DependencyInjection;
 using Stl.Fusion;
+using Stl.Fusion.Bridge;
+using Stl.Fusion.Client;
+using Stl.Fusion.Server;
 
-namespace Fusion.ServerSide
+namespace Fusion.Server
 {
     public class Startup
     {
@@ -30,19 +32,22 @@ namespace Fusion.ServerSide
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            
             // Fusion services
-            services.AddFusion();
+            services.AddSingleton(new Publisher.Options() { 
+                Id = "p-<uniqueId>", 
+            });
+            var fusion = services.AddFusion();
+            var fusionServer = fusion.AddWebServer();
+            var fusionClient = fusion.AddRestEaseClient();
+            
+            services.AddRouting();
+            // Register Replica Service controllers
+            services.AddMvc().AddApplicationPart(Assembly.GetExecutingAssembly());
+            services.AddServerSideBlazor();
+            
             // This method registers services marked with any of ServiceAttributeBase descendants, including:
             // [Service], [ComputeService], [RestEaseReplicaService], [LiveStateUpdater]
             services.UseAttributeScanner().AddServicesFrom(Assembly.GetExecutingAssembly());
-            // Default update delay is set to 0.5 seconds
-            services.AddSingleton(c => new UpdateDelayer.Options() { Delay = TimeSpan.FromSeconds(0.1) });
-
-            
-            services.AddRazorPages();
-            services.AddServerSideBlazor();
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -63,10 +68,17 @@ namespace Fusion.ServerSide
             app.UseStaticFiles();
 
             app.UseRouting();
+            
+            app.UseWebSockets(new WebSocketOptions() {
+                KeepAliveInterval = TimeSpan.FromSeconds(30),
+            });
+            app.UseFusionSession();
+            
 
-            app.UseEndpoints(endpoints =>
-            {
+            app.UseEndpoints(endpoints => {
                 endpoints.MapBlazorHub();
+                endpoints.MapFusionWebSocketServer();
+                endpoints.MapControllers();
                 endpoints.MapFallbackToPage("/_Host");
             });
         }

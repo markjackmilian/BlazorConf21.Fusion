@@ -1,6 +1,5 @@
 ﻿@page "/counter"
 @inherits Stl.Fusion.Blazor.LiveComponentBase<int>
-@inject IJSRuntime JsRuntime;
 @using Fusion.Shared
 @using System.Threading
 @using Stl.Fusion
@@ -8,33 +7,31 @@
 
 <h1>Counter</h1>
 
+<WhenException Title="Update error:" Exception="@State.Error"/>
+
 <p>Current count: @State.LastValue</p>
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<button class="btn btn-primary" @onclick="Prova">Prova</button>
 
 @code {
-    
-    protected override void OnInitialized()
+
+    private async Task Prova()
     {
-        StateHasChangedTriggers = StateEventKind.All;
-        base.OnInitialized();
+        Console.WriteLine($"EHI CIAO!: {this.State.LastValue} {this.Client.GetType()}");
+        this.State.Invalidate();
     }
-    
 
     private async Task IncrementCount()
     {
         await this.Client.AddOne();
+        State.CancelUpdateDelay();
     }
 
-    protected override void ConfigureState(LiveState<int>.Options options) => options.WithInstantUpdates();
+    // protected override void ConfigureState(LiveState<int>.Options options) => options.WithInstantUpdates();
 
-    protected override async Task<int> ComputeStateAsync(CancellationToken cancellationToken)
+    protected override Task<int> ComputeStateAsync(CancellationToken cancellationToken)
     {
-        return 16;
-        var value = await this.Client.GetValue();
-        await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure?");
-        Console.WriteLine($"Updated value is {value}");
-        return value;
-    }
-
+        return this.Client.GetValue();
+    } 
 }

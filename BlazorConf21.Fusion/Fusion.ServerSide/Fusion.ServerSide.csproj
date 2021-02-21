@@ -4,4 +4,10 @@
         <TargetFramework>net5.0</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="LiveSharp" Version="1.6.52" />
+      <PackageReference Include="Stl.Fusion.Blazor" Version="0.10.11" />
+      <PackageReference Include="Stl.Fusion.Server" Version="0.10.11" />
+    </ItemGroup>
+
 </Project>

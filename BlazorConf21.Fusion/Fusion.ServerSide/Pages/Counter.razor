@@ -1,17 +1,30 @@
 ﻿@page "/counter"
+@using Stl.Fusion.Blazor
+@using System.Threading
+@using Fusion.ServerSide.Services
+@using Stl.Fusion
+@inherits LiveComponentBase<int>
+@inject CounterService CounterService
+
 
 <h1>Counter</h1>
 
-<p>Current count: @currentCount</p>
+<p>Current count: @State.LastValue</p>
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
 @code {
-    private int currentCount = 0;
 
     private void IncrementCount()
     {
-        currentCount++;
+        this.CounterService.AddOne();
+        State.CancelUpdateDelay();
+    }
+
+    protected override async Task<int> ComputeStateAsync(CancellationToken cancellationToken)
+    {
+        var value = await this.CounterService.GetValue();
+        return value;
     }
 
 }

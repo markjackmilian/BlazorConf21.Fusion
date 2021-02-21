@@ -10,9 +10,9 @@ namespace Fusion.WebApp.Services
     [BasePath("sum")]
     public interface ISumClient 
     {
-        [ComputeMethod(KeepAliveTime = 1)]
+        [ComputeMethod]
         [Get("getvalue")]
-        Task<int> GetValue();
+        Task<string> GetValue();
         
         [Post("add")]
         Task AddOne();
