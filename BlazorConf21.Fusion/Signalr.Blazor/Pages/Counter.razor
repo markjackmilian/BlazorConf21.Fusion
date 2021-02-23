@@ -3,47 +3,44 @@
 @using Signalr.Blazor.Data
 @inject NavigationManager NavigationManager
 @inject CounterService CounterService
+@implements IDisposable
 
 <h1>Counter</h1>
 
-<p>Current count: @currentCount</p>
+<p>Current count: @_currentCount</p>
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
 @code {
-    private int currentCount = 0;
-   
+    private int _currentCount = 0;
+    private HubConnection _hubConnection;
+
     private async Task IncrementCount()
     {
         await this.CounterService.AddOne();
     }
     
-
     protected override async Task OnInitializedAsync()
     {
-        try
+        this._hubConnection = new HubConnectionBuilder()
+            .WithUrl("https://localhost:5001/counter")
+            .WithAutomaticReconnect()
+            .Build();
+        this._hubConnection.On<int>("IncrementCount", ( message) =>
         {
-            var hubConnection = new HubConnectionBuilder()
-                .WithUrl("https://localhost:5001/counter")
-                // .WithAutomaticReconnect()
-                .Build();
-            //
-            hubConnection.On<int>("IncrementCount", ( message) =>
-            {
-                this.currentCount = message;
-                StateHasChanged();
-            });
-            //
-            await hubConnection.StartAsync();
+            this._currentCount = message;
+            StateHasChanged();
+        });
+        await this._hubConnection.StartAsync();
 
-            this.currentCount = this.CounterService.GetCount();
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
-      
+        this._currentCount = this.CounterService.GetCount();
     }
-
+    
+    public void Dispose()
+    {
+        if (this._hubConnection == null) return;
+        this._hubConnection.StopAsync();
+        this._hubConnection.DisposeAsync();
+        this._hubConnection = null;
+    }
 }

@@ -61,7 +61,8 @@ namespace Signalr.Blazor
             {
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
-                endpoints.MapHub<TestHub>("/counter");
+                endpoints.MapHub<CounterHub>("/counter");
+                endpoints.MapHub<WeatherHub>("/weather");
             });
             
         }

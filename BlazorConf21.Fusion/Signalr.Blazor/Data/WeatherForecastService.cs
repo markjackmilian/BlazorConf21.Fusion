@@ -2,15 +2,24 @@ using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+using Signalr.Blazor.Hubs;
 
 namespace Signalr.Blazor.Data
 {
     public class WeatherForecastService
     {
+        private readonly IHubContext<WeatherHub> _weathHubContext;
+
         private static readonly string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
+
+        public WeatherForecastService(IHubContext<WeatherHub> weathHubContext)
+        {
+            this._weathHubContext = weathHubContext;
+        }
 
         public Task<WeatherForecast[]> GetForecastAsync(DateTime startDate)
         {
@@ -21,6 +30,7 @@ namespace Signalr.Blazor.Data
                 TemperatureC = rng.Next(-20, 55),
                 Summary = Summaries[rng.Next(Summaries.Length)]
             }).ToArray());
+            
         }
     }
 }

@@ -6,10 +6,10 @@ namespace Signalr.Blazor.Data
 {
     public class CounterService
     {
-        private readonly IHubContext<TestHub> _testHub;
+        private readonly IHubContext<CounterHub> _testHub;
         private static int _counter = 0;
 
-        public CounterService(IHubContext<TestHub> testHub)
+        public CounterService(IHubContext<CounterHub> testHub)
         {
             this._testHub = testHub;
         }
