@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Coravel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Signalr.Blazor.Data;
 using Signalr.Blazor.Hubs;
+using Signalr.Blazor.Services;
 
 namespace Signalr.Blazor
 {
@@ -36,6 +38,9 @@ namespace Signalr.Blazor
             });
             services.AddSingleton<WeatherForecastService>();
             services.AddSingleton<CounterService>();
+            services.AddTransient<WeatherInvocable>();
+
+            services.AddScheduler();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -65,6 +70,12 @@ namespace Signalr.Blazor
                 endpoints.MapHub<WeatherHub>("/weather");
             });
             
+            var provider = app.ApplicationServices;
+            provider.UseScheduler(scheduler =>
+            {
+                scheduler.Schedule<WeatherInvocable>()
+                    .EveryFiveSeconds();
+            });
         }
     }
 }
