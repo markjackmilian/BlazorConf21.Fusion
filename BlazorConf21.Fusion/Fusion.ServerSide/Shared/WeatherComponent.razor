@@ -1,15 +1,12 @@
-﻿@page "/fetchdata"
-
 @using Fusion.ServerSide.Data
-@using Fusion.ServerSide.Services
 @using System.Threading
+@using Fusion.ServerSide.Services
 @inject WeatherForecastService ForecastService
-@inherits Stl.Fusion.Blazor.LiveComponentBase<WeatherForecast[]>
+@inherits Stl.Fusion.Blazor.LiveComponentBase<Fusion.ServerSide.Data.WeatherForecast[]>
 
-<h1>Weather forecast</h1>
 
-<p>This component demonstrates fetching data from a service.</p>
-
+<h3>@this.City</h3>
+<button  @onclick="AddForecastForCity">Invalidate</button>
 
 
 @if (base.State.LastValue == null)
@@ -43,11 +40,25 @@ else
     </table>
 }
 
+
 @code {
+    
+    [Parameter] public string City { get; set; }
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        var t = 5;
+    }
 
     protected override Task<WeatherForecast[]> ComputeStateAsync(CancellationToken cancellationToken)
     {
-        return this.ForecastService.GetForecastAsync(DateTime.Today);
+        return this.ForecastService.GetForecastAsync(this.City);
+    }
+
+
+    private void AddForecastForCity()
+    {
+        this.ForecastService.UpdateForecastForCity(this.City);
     }
 
 }
